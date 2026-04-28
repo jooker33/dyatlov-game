@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>My Survival Game</title>
+</head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<body>
+  <div id="story"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/inkjs@2.3.2/dist/ink.min.js"></script>
+
+  <script>
+    fetch("dyatlov.json")
+      .then(res => res.json())
+      .then(data => {
+        const story = new inkjs.Story(data);
+        const container = document.getElementById("story");
+
+        function continueStory() {
+          while (story.canContinue) {
+            const paragraph = document.createElement("p");
+            paragraph.innerHTML = story.Continue();
+            container.appendChild(paragraph);
+          }
+
+          if (story.currentChoices.length > 0) {
+            story.currentChoices.forEach(choice => {
+              const btn = document.createElement("button");
+              btn.textContent = choice.text;
+              btn.onclick = () => {
+                container.innerHTML = "";
+                story.ChooseChoiceIndex(choice.index);
+                continueStory();
+              };
+              container.appendChild(btn);
+            });
+          }
+        }
+
+        continueStory();
+      });
+  </script>
+</body>
+</html>
