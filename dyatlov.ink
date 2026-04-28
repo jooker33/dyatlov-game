@@ -1522,15 +1522,33 @@ VAR shared_decisions = 0
 {alive_semyon: <b>Семён Золотарёв</b> — выжил.|<b>Семён Золотарёв</b> — погиб.}
 
 ~ temp survivors = 0
-{alive_igor: survivors = survivors + 1}
-{alive_zina: survivors = survivors + 1}
-{alive_luda: survivors = survivors + 1}
-{alive_sasha: survivors = survivors + 1}
-{alive_rustem: survivors = survivors + 1}
-{alive_krivo: survivors = survivors + 1}
-{alive_doro: survivors = survivors + 1}
-{alive_kolya: survivors = survivors + 1}
-{alive_semyon: survivors = survivors + 1}
+{alive_igor: 
+    ~survivors = survivors + 1
+    }
+{alive_zina: 
+~survivors = survivors + 1
+    }
+{alive_luda: 
+~survivors = survivors + 1
+}
+{alive_sasha: 
+~survivors = survivors + 1
+}
+{alive_rustem: 
+~survivors = survivors + 1
+}
+{alive_krivo: 
+~survivors = survivors + 1
+}
+{alive_doro: 
+~survivors = survivors + 1
+}
+{alive_kolya: 
+~survivors = survivors + 1
+}
+{alive_semyon: 
+~survivors = survivors + 1
+}
 
 <b>ИТОГ: {survivors} / 9 выжили.</b>
 
