@@ -672,18 +672,56 @@ VAR shared_decisions = 0
 === dig_out_critical ===
 Ты командуешь: «Копать. Все.»
 
-Снег слежался, без лопаты — голыми руками. Через десять минут пальцы перестают слушаться. Через двадцать — Дубинина садится в снег, она не может больше. Через тридцать — копаете уже только ты, Рустем, Дорошенко и Семён.
+~ temp viable_diggers = 0
+{alive_igor && cool_igor < 60:
+    ~ viable_diggers = viable_diggers + 1
+}
+{alive_rustem && cool_rustem < 60:
+    ~ viable_diggers = viable_diggers + 1
+}
+{alive_doro && cool_doro < 60:
+    ~ viable_diggers = viable_diggers + 1
+}
+{alive_semyon && cool_semyon < 60:
+    ~ viable_diggers = viable_diggers + 1
+}
 
-Но через сорок минут вы вытаскиваете спальники и часть одежды. Группа одевается. Часть уже сильно охладилась.
-~ cool_igor = cool_igor + 25
-~ cool_zina = cool_zina + 25
-~ cool_luda = cool_luda + 35
-~ cool_sasha = cool_sasha + 25
-~ cool_rustem = cool_rustem + 20
-~ cool_krivo = cool_krivo + 30
-~ cool_doro = cool_doro + 20
-~ cool_kolya = cool_kolya + 30
-~ cool_semyon = cool_semyon + 22
+{viable_diggers >= 3:
+    Снег слежался, без лопаты — голыми руками. Через десять минут пальцы перестают слушаться. Через двадцать — Дубинина садится в снег, она не может больше. Через тридцать — копаете уже только ты, Рустем, Дорошенко и Семён.
+
+    Но через сорок минут вы вытаскиваете спальники и часть одежды. Группа одевается. Часть уже сильно охладилась.
+    ~ cool_igor = cool_igor + 25
+    ~ cool_zina = cool_zina + 25
+    ~ cool_luda = cool_luda + 35
+    ~ cool_sasha = cool_sasha + 25
+    ~ cool_rustem = cool_rustem + 20
+    ~ cool_krivo = cool_krivo + 30
+    ~ cool_doro = cool_doro + 20
+    ~ cool_kolya = cool_kolya + 30
+    ~ cool_semyon = cool_semyon + 22
+- viable_diggers >= 2:
+    Сильных копателей мало — двое держат темп, остальные сдают через десять минут. Час работы — спальники извлекли, но одежду не успели вытащить. Каждый копавший — на пределе.
+    ~ cool_igor = cool_igor + 32
+    ~ cool_zina = cool_zina + 30
+    ~ cool_luda = cool_luda + 40
+    ~ cool_sasha = cool_sasha + 30
+    ~ cool_rustem = cool_rustem + 28
+    ~ cool_krivo = cool_krivo + 35
+    ~ cool_doro = cool_doro + 28
+    ~ cool_kolya = cool_kolya + 35
+    ~ cool_semyon = cool_semyon + 30
+- else:
+    Сильных копателей нет — все уже слишком охлаждены, чтобы держать ритм. Час бесполезной возни в снегу. Спальники под слежавшимся настом, не достать ни одного.
+    ~ cool_igor = cool_igor + 40
+    ~ cool_zina = cool_zina + 38
+    ~ cool_luda = cool_luda + 50
+    ~ cool_sasha = cool_sasha + 38
+    ~ cool_rustem = cool_rustem + 35
+    ~ cool_krivo = cool_krivo + 45
+    ~ cool_doro = cool_doro + 35
+    ~ cool_kolya = cool_kolya + 45
+    ~ cool_semyon = cool_semyon + 38
+}
 
 -> check_after_dig_critical
 
@@ -910,9 +948,23 @@ VAR shared_decisions = 0
 // =============================================================
 === big_fire ===
 ~ fire_lit = true
-~ fire_strong = true
 
-Дорошенко рубит сухостой. Кривонищенко разводит огонь. Через пятнадцать минут у вас приличный костёр.
+{cool_doro < 50 && cool_krivo < 50:
+    Дорошенко быстро рубит сухостой. Кривонищенко разводит огонь с первой спички. Через пятнадцать минут — приличный костёр.
+    ~ fire_strong = true
+- cool_doro < 80 && cool_krivo < 80:
+    Дорошенко рубит медленно — топор плохо держится в окоченевших руках. Кривонищенко тратит десяток спичек, прежде чем огонь схватывается. Через сорок минут — костёр горит, но дымный, слабый.
+- else:
+    Дорошенко не может удержать топор. Кривонищенко роняет спички в снег. Час уходит на жалкий, прерывистый огонь — больше дыма, чем тепла.
+    ~ cool_igor = cool_igor + 8
+    ~ cool_zina = cool_zina + 8
+    ~ cool_luda = cool_luda + 12
+    ~ cool_sasha = cool_sasha + 10
+    ~ cool_rustem = cool_rustem + 6
+    ~ cool_doro = cool_doro + 6
+    ~ cool_kolya = cool_kolya + 12
+    ~ cool_semyon = cool_semyon + 8
+}
 
 Но костёр греет только ту сторону, что к нему обращена. Ветер с другой стороны вытягивает тепло вдвое быстрее. Каждый член группы поворачивается то одной стороной, то другой — и каждый раз половина тела мёрзнет.
 
@@ -1177,14 +1229,25 @@ VAR shared_decisions = 0
     -> wait_morning
 
 === runners_self ===
-{clothes_grabbed >= 1 && flashlight_carrier == "Игорь":
-    Фонарь у тебя на поясе — путь к палатке виден.
-    Подъём занимает полчаса. Палатка засыпана, ты копаешь руками — но в свете фонаря работа идёт быстрее.
-    ~ cool_igor = cool_igor + 18
+{cool_igor < 30:
+    Холод ещё не сковал движений. Подъём идёт спокойно.
+    {clothes_grabbed >= 1 && flashlight_carrier == "Игорь":
+        Фонарь на поясе. Палатку откапываешь за двадцать минут.
+        ~ cool_igor = cool_igor + 12
+    - else:
+        Без фонаря медленнее — тридцать минут копки на ощупь.
+        ~ cool_igor = cool_igor + 18
+    }
+- cool_igor < 60:
+    Пальцы плохо слушаются. На подъём и копку уходит сорок минут — каждое движение через силу.
+    {clothes_grabbed >= 1 && flashlight_carrier == "Игорь":
+        ~ cool_igor = cool_igor + 22
+    - else:
+        ~ cool_igor = cool_igor + 30
+    }
 - else:
-    Без фонаря — путь на ощупь по тёмному склону. Дважды падаешь.
-    Подъём занимает полчаса с лишним. Палатка засыпана, ты копаешь руками вслепую.
-    ~ cool_igor = cool_igor + 30
+    Каждый шаг — усилие. Лёгкие горят, ноги не слушаются. Копать почти не получается — выдираешь из-под снега две вещи и поворачиваешь обратно.
+    ~ cool_igor = cool_igor + 38
 }
 
 -> runners_self_check
@@ -1196,7 +1259,7 @@ VAR shared_decisions = 0
     ~ death_count = death_count + 1
     -> control_transfer
 - else:
-    Когда возвращаешься — у тебя в руках три спальника и две куртки. Группа ждёт.
+    Когда возвращаешься — приносишь то, что смог унести. Группа ждёт.
     {fire_lit: Костёр горит.|}
     ~ clothes_grabbed = 1
     -> runners_self_distribute
@@ -1444,21 +1507,19 @@ VAR shared_decisions = 0
     -> wait_for_search
 
 === send_for_help ===
-{alive_rustem && cool_rustem < 60 && alive_doro && cool_doro < 60:
+{alive_rustem && cool_rustem < 60 && alive_doro && cool_doro < 60 && rel_rustem >= 40 && rel_doro >= 40:
     Рустем и Дорошенко уходят. Через два дня они дойдут до посёлка манси, ещё через день — до Вижая. Помощь придёт на четвёртый день.
     ~ rescue_signal_sent = true
+- alive_semyon && cool_semyon < 60 && alive_rustem && cool_rustem < 60 && rel_semyon >= 40 && rel_rustem >= 40:
+    Семён и Рустем уходят. Они дойдут.
+    ~ rescue_signal_sent = true
+- alive_semyon && cool_semyon < 70 && rel_semyon >= 40:
+    Семён один уходит. Долго. Но он фронтовик, дойдёт.
+    ~ rescue_signal_sent = true
+- (alive_rustem && cool_rustem < 60) || (alive_doro && cool_doro < 60) || (alive_semyon && cool_semyon < 70):
+    Способные идти есть — но никто не вызывается. Они слышат твой приказ молча: твои слова больше не имеют веса.
 - else:
-    {alive_semyon && cool_semyon < 60 && alive_rustem && cool_rustem < 60:
-        Семён и Рустем уходят. Они дойдут.
-        ~ rescue_signal_sent = true
-    - else:
-        {alive_semyon && cool_semyon < 70:
-            Семён один уходит. Долго. Но он фронтовик, дойдёт.
-            ~ rescue_signal_sent = true
-        - else:
-            Никто не в состоянии идти. Группа остаётся ждать.
-        }
-    }
+    Никто не в состоянии идти. Группа остаётся ждать.
 }
 
 -> rescue_resolution
