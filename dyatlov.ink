@@ -879,6 +879,13 @@ VAR shared_decisions = 0
     Фонарь тоже наверху, в палатке.
 }
 
+У {rope_carrier} верёвка?
+{clothes_grabbed >= 1 && rope_carrier != "никто":
+    Да — двадцать метров верёвки в рюкзаке.
+- else:
+    Верёвка осталась в палатке.
+}
+
 -> cedar_decision
 
 === cedar_decision ===
@@ -1124,20 +1131,38 @@ VAR shared_decisions = 0
     -> all_back_to_tent
 
 === runners_strong ===
-Двое сильных уходят в темноту. Группа остаётся у кедра.
+Двое сильных собираются наверх. Семён бросает: «Возьмите верёвку — спустите вещи цепью, не на руках.»
 
-Через {rel_rustem >= 60 && rel_doro >= 60: сорок минут|час} они возвращаются. С ними — четыре спальника, три куртки, валенки.
+* {clothes_grabbed >= 1 && rope_carrier != "никто"} [Взять верёвку — спустят весь груз связкой]
+    ~ rope_carrier = "никто"
+    Двое уходят с верёвкой. Через {rel_rustem >= 60 && rel_doro >= 60: тридцать минут|пятьдесят минут} возвращаются — спальники, печка, куртки, продукты, валенки. Всё. Верёвка остаётся обмотанной вокруг ствола наверху.
+    ~ clothes_grabbed = 2
+    ~ cool_igor = cool_igor - 18
+    ~ cool_zina = cool_zina - 18
+    ~ cool_luda = cool_luda - 18
+    ~ cool_sasha = cool_sasha - 18
+    ~ cool_krivo = cool_krivo - 18
+    ~ cool_kolya = cool_kolya - 18
+    ~ cool_semyon = cool_semyon - 18
+    -> runners_strong_after
 
+* [Уходят налегке — что унесут на руках]
+    Двое сильных уходят в темноту. Группа остаётся у кедра.
+
+    Через {rel_rustem >= 60 && rel_doro >= 60: сорок минут|час} они возвращаются. С ними — четыре спальника, три куртки, валенки.
+    ~ clothes_grabbed = 1
+    ~ cool_igor = cool_igor - 12
+    ~ cool_zina = cool_zina - 12
+    ~ cool_luda = cool_luda - 12
+    ~ cool_sasha = cool_sasha - 12
+    ~ cool_krivo = cool_krivo - 12
+    ~ cool_kolya = cool_kolya - 12
+    ~ cool_semyon = cool_semyon - 12
+    -> runners_strong_after
+
+=== runners_strong_after ===
 Группа лезет в спальники.
 {fire_lit: У костра + тепло спальников = выживание.|}
-~ clothes_grabbed = 1
-~ cool_igor = cool_igor - 12
-~ cool_zina = cool_zina - 12
-~ cool_luda = cool_luda - 12
-~ cool_sasha = cool_sasha - 12
-~ cool_krivo = cool_krivo - 12
-~ cool_kolya = cool_kolya - 12
-~ cool_semyon = cool_semyon - 12
 
 -> runners_strong_check
 
@@ -1457,20 +1482,27 @@ VAR shared_decisions = 0
 -> ending
 
 === walk_all ===
-Группа выходит. Идут те, кто может. Слабые опираются на сильных.
+{clothes_grabbed >= 1 && rope_carrier != "никто":
+    Семён вспоминает фронтовой приём — связка. «Слабые в середину, сильные по краям. Никто не отстанет, никто не уйдёт под снег.»
+    ~ rope_carrier = "никто"
+    Группа выходит цепью. Двое суток медленного, но непрерывного хода — никто не падает безвозвратно. На третьи сутки дошедшие выходят к манси.
+    ~ rescue_signal_sent = true
+- else:
+    Группа выходит. Идут те, кто может. Слабые опираются на сильных.
 
-{cool_igor >= 70 || cool_zina >= 70 || cool_luda >= 70: На пути падают самые слабые. Их несут или оставляют.|}
+    {cool_igor >= 70 || cool_zina >= 70 || cool_luda >= 70: На пути падают самые слабые. Их несут или оставляют.|}
 
-Через два дня дошедшие выходят к манси. Помощь приходит за теми, кто остался.
-~ rescue_signal_sent = true
+    Через два дня дошедшие выходят к манси. Помощь приходит за теми, кто остался.
+    ~ rescue_signal_sent = true
 
-{cool_luda >= 80 && alive_luda:
-    ~ alive_luda = false
-    ~ death_count = death_count + 1
-}
-{cool_kolya >= 80 && alive_kolya:
-    ~ alive_kolya = false
-    ~ death_count = death_count + 1
+    {cool_luda >= 80 && alive_luda:
+        ~ alive_luda = false
+        ~ death_count = death_count + 1
+    }
+    {cool_kolya >= 80 && alive_kolya:
+        ~ alive_kolya = false
+        ~ death_count = death_count + 1
+    }
 }
 
 -> ending
