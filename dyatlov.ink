@@ -866,20 +866,27 @@ VAR shared_decisions = 0
 }
 
 У {matches_carrier} спички?
-{matches_carrier != "никто":
-    Да — спички с нами.
+{clothes_grabbed >= 1 && matches_carrier != "никто":
+    Да — спички в кармане у того, кто успел одеться.
 - else:
-    Спички остались наверху.
+    Спички в палатке — в куртке, которую никто не натянул.
+}
+
+У {flashlight_carrier} фонарь?
+{clothes_grabbed >= 1 && flashlight_carrier != "никто":
+    Да — фонарь с нами.
+- else:
+    Фонарь тоже наверху, в палатке.
 }
 
 -> cedar_decision
 
 === cedar_decision ===
 
-* {matches_carrier != "никто" && (axe_carrier == "Игорь" || axe_carrier == "Рустем" || axe_carrier == "Дорошенко" || axe_carrier == "Семён")} [Развести большой костёр]
+* {clothes_grabbed >= 1 && matches_carrier != "никто" && (axe_carrier == "Игорь" || axe_carrier == "Рустем" || axe_carrier == "Дорошенко" || axe_carrier == "Семён")} [Развести большой костёр]
     -> big_fire
-    
-* {matches_carrier != "никто"} [Развести маленький костёр - дров мало]
+
+* {clothes_grabbed >= 1 && matches_carrier != "никто"} [Развести маленький костёр - дров мало]
     -> small_fire
     
 * [Строить снежное укрытие у корней кедра — приоритет]
@@ -1145,8 +1152,15 @@ VAR shared_decisions = 0
     -> wait_morning
 
 === runners_self ===
-Ты идёшь один. Подъём занимает полчаса. Палатка засыпана, ты копаешь руками.
-~ cool_igor = cool_igor + 25
+{clothes_grabbed >= 1 && flashlight_carrier == "Игорь":
+    Фонарь у тебя на поясе — путь к палатке виден.
+    Подъём занимает полчаса. Палатка засыпана, ты копаешь руками — но в свете фонаря работа идёт быстрее.
+    ~ cool_igor = cool_igor + 18
+- else:
+    Без фонаря — путь на ощупь по тёмному склону. Дважды падаешь.
+    Подъём занимает полчаса с лишним. Палатка засыпана, ты копаешь руками вслепую.
+    ~ cool_igor = cool_igor + 30
+}
 
 -> runners_self_check
 
@@ -1265,11 +1279,17 @@ VAR shared_decisions = 0
 -> wait_morning
 
 === seek_wood ===
-Двое уходят в тёмный лес за дровами. Возвращается один.
-~ alive_doro = false
-~ death_count = death_count + 1
+{clothes_grabbed >= 1 && flashlight_carrier != "никто":
+    Дорошенко берёт фонарь и уходит. Через двадцать минут возвращается с охапкой сухостоя — света хватило, чтобы найти упавшее дерево.
+    ~ cool_doro = cool_doro + 12
+    ~ fire_lit = true
+- else:
+    Двое уходят в тёмный лес за дровами. Возвращается один.
+    ~ alive_doro = false
+    ~ death_count = death_count + 1
 
-Дорошенко не вернулся. Утром его найдут у поваленного дерева, у которого он пытался отломать ветку.
+    Дорошенко не вернулся. Утром его найдут у поваленного дерева, у которого он пытался отломать ветку.
+}
 
 -> build_shelter_late
 
